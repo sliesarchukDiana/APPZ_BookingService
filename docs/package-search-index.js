@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"com.ascariaa"},{"l":"com.ascariaa.entity"},{"l":"com.ascariaa.service"}];updateSearchResults();
