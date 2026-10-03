@@ -2,41 +2,84 @@ package com.ascariaa;
 
 import com.ascariaa.entity.*;
 import com.ascariaa.service.*;
-import com.ascariaa.factory.*;
 
+/**
+ * Головний клас для тестування структурних шаблонів проєктування (Лабораторні роботи 6-8).
+ */
 public class Main {
     public static void main(String[] args) {
-        System.out.println(" 1. Singleton ");
-        BookingController controller = BookingController.getInstance();
+        User regularUser = new User("U-001", "Таня");
+        User guestUser = new User("GUEST-001", "Невідомий");
+        Room room1 = new Room("R-101", "Conference Room", 50);
+        Schedule schedule = new Schedule("R-101");
 
-        System.out.println("\n 2. Prototype ");
-        Room baseRoom = new Room("R-01", "Base Layout", 20);
-        Room clonedRoom = baseRoom.clone();
-        clonedRoom.setId("R-02");
+        System.out.println(" Лабораторна робота №6 ");
 
-        System.out.println("\n 3. Factory Method ");
-        RoomFactory basicFactory = new ConferenceRoomFactory();
-        Room confRoom = basicFactory.createRoom("CONF-100");
+        System.out.println("\n Шаблон Adapter ");
+        IBookingProcessor adapter = new CalendarAdapter();
+        adapter.createBookingRequest(regularUser, room1, schedule, "10:00", "12:00");
 
-        System.out.println("\n 4. Abstract Factory ");
-        FacilityFactory vipFactory = new VIPFacilityFactory();
-        Room vipRoom = vipFactory.createRoom("VIP-200");
-        Equipment eq = vipFactory.createEquipment();
-        eq.setup();
+        System.out.println("\n Шаблон Bridge ");
+        BookingNotifier emailNotifier = new BookingNotifier(new EmailSender());
+        emailNotifier.notifyUser("B-1001");
 
-        System.out.println("\n 5. Object Pool ");
-        RoomPool pool = new RoomPool(2);
-        Room pooledRoom = pool.acquireRoom();
+        BookingNotifier smsNotifier = new BookingNotifier(new SmsSender());
+        smsNotifier.notifyUser("B-1002");
 
-        System.out.println("\n 6. Builder ");
-        User user = new User("U1", "John Doe");
-        Booking booking = new Booking.Builder("B-1000")
-                .room(pooledRoom)
-                .user(user)
-                .time("2023-10-25 10:00", "2023-10-25 12:00")
+        System.out.println("\n Лабораторна робота №7 ");
+
+        System.out.println("\n Шаблон Composite ");
+        Floor firstFloor = new Floor("Перший поверх");
+        Floor mainBuilding = new Floor("Головний корпус");
+
+        Space spaceRoom = new Space() {
+            @Override
+            public void getDetails() {
+                room1.getDetails();
+            }
+        };
+
+        firstFloor.addSpace(spaceRoom);
+        mainBuilding.addSpace(firstFloor);
+        mainBuilding.getDetails();
+
+        System.out.println("\n Шаблон Flyweight ");
+        RoomType type1 = RoomTypeFactory.getRoomType("Conference", 50);
+        RoomType type2 = RoomTypeFactory.getRoomType("Conference", 50);
+        RoomType type3 = RoomTypeFactory.getRoomType("VIP", 10);
+
+        type1.displayCapabilities();
+        type3.displayCapabilities();
+        System.out.println("type1 == type2: " + (type1 == type2));
+
+
+        System.out.println("\n Лабораторна робота №8 ");
+
+        System.out.println("\n Шаблон Decorator ");
+        Booking baseBooking = new Booking.Builder("B-2001")
+                .room(room1)
+                .user(regularUser)
+                .time("14:00", "16:00")
                 .build();
-        booking.confirm();
 
-        pool.releaseRoom(pooledRoom);
+        IBooking bookingAdapter = new IBooking() {
+            @Override
+            public void confirm() {
+                baseBooking.confirm();
+            }
+        };
+
+        IBooking cateredBooking = new CateringDecorator(bookingAdapter);
+        cateredBooking.confirm();
+
+        System.out.println("\n Шаблон Proxy ");
+        BookingController realController = BookingController.getInstance();
+        IBookingProcessor proxy = new BookingProcessorProxy(realController);
+
+        System.out.println("[Тест Proxy] Спроба 1 (Звичайний користувач):");
+        proxy.createBookingRequest(regularUser, room1, schedule, "14:00", "16:00");
+
+        System.out.println("\n[Тест Proxy] Спроба 2 (Користувач-гість):");
+        proxy.createBookingRequest(guestUser, room1, schedule, "16:00", "18:00");
     }
 }
