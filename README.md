@@ -1,7 +1,5 @@
 <h2>Опис паттернів у проєкті</h2>
 
-<hr>
-
 <h3>***Лабораторна робота №1-2***</h3>
 
 * **Dependency Inversion Principle (DIP) / SOLID:** Застосовано при створенні інтерфейсу `IBookingProcessor`. Класи не залежать від конкретних реалізацій обробника бронювань (наприклад, `BookingController` або `CalendarAdapter`), а залежать від абстракції `IBookingProcessor`.   
